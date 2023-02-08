@@ -1,4 +1,5 @@
 require("dotenv").config();
+const cors = require("cors");
 const express = require("express");
 const mongoose = require("mongoose");
 const morgan = require("morgan");
@@ -6,6 +7,10 @@ const connectDB = require("./configs/database.config.js");
 
 const app = express();
 const PORT = process.env.PORT;
+
+// CORS
+app.use(cors());
+app.options("*", cors());
 
 // Connect to the database
 mongoose.set("strictQuery", false);
