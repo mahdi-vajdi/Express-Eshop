@@ -27,6 +27,7 @@ app.use(morgan("tiny"));
 
 //Routes
 const api = process.env.API_URL;
+app.use(`${api}/categories`, require("./routes/category.route"));
 app.use(`${api}/products`, require("./routes/products.route"));
 
 // Start Listetning
