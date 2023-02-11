@@ -1,8 +1,16 @@
 const { Product } = require("../models/product.model");
+const { Category } = require("../models/category.model");
 const mongoose = require("mongoose");
 
 exports.createProduct = async (req, res) => {
   try {
+    // Validate category field
+    const category = await Category.findById(req.body.category);
+    if (!category)
+      return res
+        .status(400)
+        .json({ message: "The category field doesn't exist." });
+
     const createdProduct = await Product.create(req.body);
     res
       .status(200)
@@ -13,8 +21,10 @@ exports.createProduct = async (req, res) => {
 };
 
 exports.getAllProducts = async (req, res) => {
+  let filter = {};
+  if (req.query.cat) filter = { category: req.query.cat.split(",") };
   try {
-    const products = await Product.find();
+    const products = await Product.find(filter).populate("category");
     if (!products) return res.status(404).json("There is no products");
 
     res.status(200).json(products);
@@ -30,7 +40,9 @@ exports.getProduct = async (req, res) => {
       .json({ message: "The requested ID does not have a correct form" });
 
   try {
-    const foundProduct = await Product.findById(req.params.id);
+    const foundProduct = await Product.findById(req.params.id).populate(
+      "category"
+    );
     if (!foundProduct)
       return res
         .status(404)
@@ -49,6 +61,15 @@ exports.updateProduct = async (req, res) => {
       .json({ message: "The requested ID does not have a correct form" });
 
   try {
+    // Validate category field
+    if (req.body.category) {
+      const category = await Category.findById(req.body.category);
+      if (!category)
+        return res
+          .status(400)
+          .json({ message: "The category field doesn't exist." });
+    }
+
     const updatedProduct = await Product.findByIdAndUpdate(
       req.params.id,
       req.body,
@@ -88,4 +109,18 @@ exports.deleteProduct = async (req, res) => {
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
+};
+
+exports.getProductCount = async (req, res) => {
+  const prodCount = await Product.countDocuments();
+
+  if (!prodCount) return res.status(500).json({ success: false });
+  res.status(200).json({ productCount: prodCount });
+};
+
+exports.getFeaturedProuducts = async (req, res) => {
+  const featProds = await Product.find({ isFeatured: true });
+
+  if (!featProds) return res.status(500).json({ success: false });
+  res.status(200).json({ featuredProducts: featProds });
 };
