@@ -8,14 +8,15 @@ const {
   getProductCount,
   getFeaturedProuducts,
 } = require("../controllers/products.controller");
+const authenticate = require("../middlewares/auth.middleware");
 
 const router = Router();
 
-router.post("/", createProduct);
+router.post("/", authenticate, createProduct);
 router.get("/", getAllProducts);
 router.get("/:id", getProduct);
-router.put("/:id", updateProduct);
-router.delete("/:id", deleteProduct);
+router.put("/:id", authenticate, updateProduct);
+router.delete("/:id", authenticate, deleteProduct);
 router.get("/get/count", getProductCount);
 router.get("/get/featured", getFeaturedProuducts);
 
