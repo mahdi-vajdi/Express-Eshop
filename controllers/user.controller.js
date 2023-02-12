@@ -52,6 +52,13 @@ exports.getUser = async (req, res) => {
   }
 };
 
+exports.getUserCount = async (req, res) => {
+  const userCount = await User.countDocuments();
+
+  if (!userCount) return res.status(500).json({ success: false });
+  res.status(200).json({ userCount });
+};
+
 exports.updateUser = async (req, res) => {
   if (!mongoose.isValidObjectId(req.params.id))
     return res
