@@ -7,10 +7,12 @@ module.exports = (req, res, next) => {
   console.log(token);
   jwt.verify(token, process.env.TOKEN_SECRET, (err, decoded) => {
     if (err) {
-      console.log("verfication error: ", err);
+      console.log("verfication error: ", err.message);
       return res.sendStatus(403); // Invalid token
     }
-    req.user = { id: decoded.id };
+    console.log("isAdmin: ", decoded.isAdmin);
+    req.user = { id: decoded.id, isAdmin: decoded.isAdmin };
+    if (!decoded.isAdmin) return res.sendStatus(403);
     next();
   });
 };

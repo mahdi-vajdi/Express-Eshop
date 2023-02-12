@@ -67,6 +67,7 @@ userSchema.methods.comparePassword = function (password) {
 userSchema.methods.generateJWT = function (expiry) {
   let payload = {
     id: this._id,
+    isAdmin: this.isAdmin,
   };
 
   return jwt.sign(payload, process.env.TOKEN_SECRET, {
