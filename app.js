@@ -32,6 +32,7 @@ app.use(`${api}/auth`, require("./routes/auth.route"));
 app.use(`${api}/users`, authenticate, require("./routes/user.route"));
 app.use(`${api}/categories`, require("./routes/category.route"));
 app.use(`${api}/products`, require("./routes/products.route"));
+app.use(`${api}/orders`, authenticate, require("./routes/order.route"));
 
 // Start Listetning
 mongoose.connection.once("open", () => {
