@@ -1,4 +1,5 @@
 const express = require("express");
+const { authAdmin } = require("../middlewares/auth.middleware");
 const {
   createUser,
   getAllUsers,
@@ -9,11 +10,11 @@ const {
 } = require("../controllers/user.controller");
 const router = express.Router();
 
-router.post("/", createUser);
-router.get("/", getAllUsers);
-router.get("/:id", getUser);
-router.get("/get/count", getUserCount);
-router.put("/:id", updateUser);
-router.delete("/:id", deleteUser);
+router.post("/", authAdmin, createUser);
+router.get("/", authAdmin, getAllUsers);
+router.get("/:id", authAdmin, getUser);
+router.get("/get/count", authAdmin, getUserCount);
+router.put("/:id", authAdmin, updateUser);
+router.delete("/:id", authAdmin, deleteUser);
 
 module.exports = router;

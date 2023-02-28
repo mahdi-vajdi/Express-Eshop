@@ -1,4 +1,5 @@
 const { Router } = require("express");
+const { authAdmin, authUser } = require("../middlewares/auth.middleware");
 const {
   createOrder,
   getAllOrders,
@@ -11,13 +12,13 @@ const {
 } = require("../controllers/order.controller");
 const router = Router();
 
-router.post("/", createOrder);
-router.get("/", getAllOrders);
-router.get("/:id", getOrder);
-router.get("/get/ordercount", getOrderCount);
-router.get("/get/totalsales", getTotalSales);
-router.get("/get/orders", getUserOrders);
-router.put("/:id", updateOrderStatus);
-router.delete("/:id", deleteOrder);
+router.post("/", authUser, createOrder);
+router.get("/", authAdmin, getAllOrders);
+router.get("/:id", authAdmin, getOrder);
+router.get("/get/ordercount", authAdmin, getOrderCount);
+router.get("/get/totalsales", authAdmin, getTotalSales);
+router.get("/get/orders", authUser, getUserOrders);
+router.put("/:id", authAdmin, updateOrderStatus);
+router.delete("/:id", authAdmin, deleteOrder);
 
 module.exports = router;

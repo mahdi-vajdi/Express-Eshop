@@ -1,4 +1,5 @@
 const { Router } = require("express");
+const { authAdmin } = require("../middlewares/auth.middleware");
 const {
   createProduct,
   getAllProducts,
@@ -7,16 +8,23 @@ const {
   deleteProduct,
   getProductCount,
   getFeaturedProuducts,
+  setGalleryImages,
 } = require("../controllers/products.controller");
-const authenticate = require("../middlewares/auth.middleware");
+const { uploadOptions } = require("../middlewares/imageUpload.middleware");
 
 const router = Router();
 
-router.post("/", authenticate, createProduct);
+router.post("/", authAdmin, uploadOptions.single("image"), createProduct);
 router.get("/", getAllProducts);
 router.get("/:id", getProduct);
-router.put("/:id", authenticate, updateProduct);
-router.delete("/:id", authenticate, deleteProduct);
+router.put("/:id", authAdmin, updateProduct);
+router.put(
+  "/gallery/:id",
+  authAdmin,
+  uploadOptions.array("images", 10),
+  setGalleryImages
+);
+router.delete("/:id", authAdmin, deleteProduct);
 router.get("/get/count", getProductCount);
 router.get("/get/featured", getFeaturedProuducts);
 

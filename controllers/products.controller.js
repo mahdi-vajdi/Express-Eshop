@@ -11,6 +11,13 @@ exports.createProduct = async (req, res) => {
         .status(400)
         .json({ message: "The category field doesn't exist." });
 
+    // set image for the product
+    const imagePath = `${req.protocol}://${req.get("host")}/public/uploads/${
+      req.file.filename
+    }`;
+    req.body.image = imagePath;
+    console.log("image: " + req.body.image);
+
     const createdProduct = await Product.create(req.body);
     res
       .status(200)
@@ -92,7 +99,54 @@ exports.updateProduct = async (req, res) => {
   }
 };
 
+exports.setGalleryImages = async (req, res) => {
+  // For Admins only
+  if (!req.user.idAdmin) return res.sendStatus(403);
+
+  if (!mongoose.isValidObjectId(req.params.id)) {
+    return res
+      .status(400)
+      .json({ message: "The requested ID does not have a correct form" });
+  }
+
+  const basePath = `${req.protocol}://${req.get("host")}/public/uploads/`;
+  const imagePaths = [];
+  if (req.files) {
+    req.files.map((file) => {
+      const imagePath = `${basePath}${file.filename}`;
+      imagePaths.push(imagePath);
+    });
+  }
+
+  try {
+    const updatedProduct = await Product.findByIdAndUpdate(
+      req.params.id,
+      {
+        images: imagePaths,
+      },
+      {
+        returnDocument: "after",
+        runValidators: true,
+      }
+    );
+
+    if (!updatedProduct)
+      return res
+        .status(404)
+        .json({ message: "The requested ID does not have a correct form" });
+
+    res
+      .status(200)
+      .json({ message: "Product updated successfully", updatedProduct });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
 exports.deleteProduct = async (req, res) => {
+  // For Admins only
+  if (!req.user.idAdmin) return res.sendStatus(403);
+
   if (!mongoose.isValidObjectId(req.params.id))
     return res
       .status(400)

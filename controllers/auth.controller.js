@@ -1,22 +1,21 @@
 const { User } = require("../models/user.model");
-const mongoose = require("mongoose");
 
 exports.register = async (req, res) => {
-  const { username, password } = req.body;
-  if (!username || !password)
+  const { email, password } = req.body;
+  if (!email || !password)
     return res
       .status(400)
-      .json({ message: "Username and Password are required." });
-  // check for duplicate usernames in database
-  const duplicate = await User.findOne({ username: username }).exec();
+      .json({ message: "Email and Password are required." });
+  // check for duplicate email in database
+  const duplicate = await User.findOne({ email }).exec();
   if (duplicate) return res.sendStatus(409); // Conflict
   try {
-    // Encrypt the password
-    const hashedPwd = await bcrypt.hash(password, 10);
+    // set user isAdmin to false
+    req.body.isAdmin = false;
     // Store the new user
-    const result = await User.create({ username, password });
+    const result = await User.create(req.body);
     console.log(result);
-    res.status(201).json({ success: `New user ${username} created.` });
+    res.status(201).json({ success: `New user ${email} created.` });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
