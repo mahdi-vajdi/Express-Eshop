@@ -1,21 +1,23 @@
 const { User } = require("../models/user.model");
 
 exports.register = async (req, res) => {
-  const { email, password } = req.body;
-  if (!email || !password)
+  const { phone, password } = req.body;
+  if (!phone || !password)
     return res
       .status(400)
-      .json({ message: "Email and Password are required." });
+      .json({ message: "Phone number and Password are required." });
+
   // check for duplicate email in database
-  const duplicate = await User.findOne({ email }).exec();
+  const duplicate = await User.findOne({ phone }).exec();
   if (duplicate) return res.sendStatus(409); // Conflict
+
   try {
     // set user isAdmin to false
     req.body.isAdmin = false;
     // Store the new user
     const result = await User.create(req.body);
     console.log(result);
-    res.status(201).json({ success: `New user ${email} created.` });
+    res.status(201).json({ success: "New user created." });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }

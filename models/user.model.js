@@ -2,16 +2,9 @@ const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const { Profile } = require("./profile.model");
 
 const userSchema = new Schema({
-  name: {
-    type: String,
-    required: true,
-  },
-  email: {
-    type: String,
-    required: true,
-  },
   password: {
     type: String,
     required: true,
@@ -24,32 +17,14 @@ const userSchema = new Schema({
     type: Boolean,
     default: false,
   },
-  street: {
-    type: String,
-    default: "",
-  },
-  apartment: {
-    type: String,
-    default: "",
-  },
-  zip: {
-    type: String,
-    default: "",
-  },
-  city: {
-    type: String,
-    default: "",
-  },
-  country: {
-    type: String,
-    default: "",
-  },
+  profile: mongoose.Schema.Types.ObjectId,
 });
 
 userSchema.pre("save", async function (next) {
   const user = this;
   console.log("model user: ", user);
   if (!user.isModified("password")) return next();
+  this.wasNew = this.isNew;
 
   // Encrypt the password
   try {
@@ -57,6 +32,17 @@ userSchema.pre("save", async function (next) {
     user.password = hashedPwd;
   } catch (err) {
     return next(err);
+  }
+});
+
+userSchema.post("save", async function (next) {
+  if (this.wasNew) {
+    try {
+      const profile = await Profile.create({ user: this._id });
+      this.profile = profile._id;
+    } catch (error) {
+      return next(error);
+    }
   }
 });
 

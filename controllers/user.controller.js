@@ -2,14 +2,16 @@ const { User } = require("../models/user.model");
 const mongoose = require("mongoose");
 
 exports.createUser = async (req, res) => {
-  const { email, password } = req.body;
-  if (!email || !password)
+  const { phone, password } = req.body;
+  if (!phone || !password)
     return res
       .status(400)
-      .json({ message: "Email and Password are required." });
-  // check for duplicate email in database
-  const duplicate = await User.findOne({ email }).exec();
+      .json({ message: "Phone number and Password are required." });
+
+  // check for duplicate phone in database
+  const duplicate = await User.findOne({ phone }).exec();
   if (duplicate) return res.sendStatus(409); // Conflict
+
   try {
     // Store the new user
     const result = await User.create(req.body);
